@@ -3,9 +3,10 @@ import sys
 
 
 class Ass2srt:
-    def __init__(self, filename):
+    def __init__(self, filename, encoding="utf-8"):
         self.filename = filename
-        self.load()
+        self.encoding = encoding
+        self.load(encoding)
 
     def output_name(self, tag=None):
         outputfile = self.filename[0:-4]
@@ -13,11 +14,14 @@ class Ass2srt:
             outputfile = outputfile+"."+tag
         return outputfile+".srt"
 
-    def load(self, filename=None):
+    def load(self, filename=None, encoding=None):
         if filename is None:
             filename = self.filename
 
-        with open(file=filename, mode="r", encoding="utf-8") as f:
+        if encoding is None:
+            encoding = self.encoding
+
+        with open(file=filename, mode="r", encoding=encoding) as f:
             data = f.readlines()
 
         self.nodes = []
@@ -32,10 +36,12 @@ class Ass2srt:
                 self.nodes.append(node)
                 # print(f"{node[1]}-->{node[2]}:{node[9]}\n")
 
-    def to_srt(self, name=None, line=0, tag=None):
+    def to_srt(self, name=None, encoding=None, line=0, tag=None):
         if name is None:
             name = self.output_name(tag=tag)
-        with open(file=name, mode="w", encoding="utf-8") as f:
+        if encoding is None:
+            encoding = self.encoding
+        with open(file=name, mode="w", encoding=encoding) as f:
             index = 1
             for node in self.nodes:
                 f.writelines(f"{index}\n")
