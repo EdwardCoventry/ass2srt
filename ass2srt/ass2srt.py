@@ -6,7 +6,8 @@ class Ass2srt:
     def __init__(self, filename, encoding="utf-8"):
         self.filename = filename
         self.encoding = encoding
-        self.load(encoding)
+        self.load(filename=filename,
+                  encoding=encoding)
 
     def output_name(self, tag=None):
         outputfile = self.filename[0:-4]
