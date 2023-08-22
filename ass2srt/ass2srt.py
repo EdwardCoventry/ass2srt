@@ -29,7 +29,9 @@ class Ass2srt:
         for line in data:
             if line.startswith("Dialogue"):
                 line = line.lstrip("Dialogue:")
-                node = line.split(",")
+                #  split at commas, unless in bracktes, eg  {\fad(500,500)}{\be35}樱律联萌站 bbs.ylbud.com
+                #  note that perhaps it would be better to split at commas, unless in curley brackets
+                node = utils.print_from(re.split(r'\,\s*(?![^()]*\))', line))
                 node[1] = timefmt(node[1])
                 node[2] = timefmt(node[2])
                 node[9] = re.sub(r'{.*}', "", node[9]).strip()
@@ -57,7 +59,7 @@ class Ass2srt:
                     text = node[9]
                 f.writelines(f"{text}\n\n")
                 index += 1
-            print(f"字幕转换完成:{self.filename}-->{name}")
+            # print(f"字幕转换完成:{self.filename}-->{name}")
 
     def __str__(self):
         return f"文件名:{self.filename}\n合计{len(self.nodes)}条字幕\n"
