@@ -32,10 +32,22 @@ class Ass2srt:
                 #  split at commas, unless in bracktes, eg  {\fad(500,500)}{\be35}樱律联萌站 bbs.ylbud.com
                 #  note that perhaps it would be better to split at commas, unless in curley brackets
                 node = re.split(r'\,\s*(?![^()]*\))', line)
+
+                assert len(node) == 10
+
                 node[1] = timefmt(node[1])
                 node[2] = timefmt(node[2])
-                node[9] = re.sub(r'{.*}', "", node[9]).strip()
+
+                # Extract contents within curly brackets
+                bracket_contents = re.findall(r'\{(.*?)\}', node[9])
+                # Remove everything within curly brackets from node[9] using bracket_contents
+                for content in bracket_contents:
+                    node[9] = node[9].replace("{" + content + "}", "")
+
                 node[9] = re.sub(r'\\N', "\n", node[9])
+
+                node.append(bracket_contents)
+
                 self.nodes.append(node)
                 # print(f"{node[1]}-->{node[2]}:{node[9]}\n")
 
