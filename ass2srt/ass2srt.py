@@ -31,7 +31,7 @@ class Ass2srt:
                 line = line.lstrip("Dialogue:")
                 #  split at commas, unless in bracktes, eg  {\fad(500,500)}{\be35}樱律联萌站 bbs.ylbud.com
                 #  note that perhaps it would be better to split at commas, unless in curley brackets
-                node = re.split(r'\,\s*(?![^()]*\))', line)
+                node = re.split(r'\,\s*(?![^()]*\))', line, maxsplit=9)
 
                 assert len(node) == 10
 
