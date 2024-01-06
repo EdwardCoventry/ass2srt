@@ -31,7 +31,7 @@ class Ass2srt:
                 line = line.lstrip("Dialogue:")
                 #  split at commas, unless in bracktes, eg  {\fad(500,500)}{\be35}樱律联萌站 bbs.ylbud.com
                 #  note that perhaps it would be better to split at commas, unless in curley brackets
-                node = re.split(r'\,\s*(?![^()]*\))', line, maxsplit=9)
+                node = _split_ignoring_parentheses(line, delimiter=',')
 
                 assert len(node) == 10
 
@@ -75,6 +75,40 @@ class Ass2srt:
 
     def __str__(self):
         return f"文件名:{self.filename}\n合计{len(self.nodes)}条字幕\n"
+
+
+
+def _split_ignoring_parentheses(s, delimiter=','):
+    splits = []
+    last_split = 0
+    stack = []  # Stack to keep track of the types of open parentheses
+
+    # Define pairs of parentheses including half-width and full-width characters
+    parentheses_pairs = [
+        "()", "（）",  # Regular and full-width round brackets
+        "[]", "［］",  # Regular and full-width square brackets
+        "{}", "【】",  # Curly and full-width fancy brackets
+        "<>", "〈〉", "＜＞"  # Regular, full-width, and fancy angle brackets
+    ]
+    open_paren = "".join([pair[0] for pair in parentheses_pairs])
+    close_paren = "".join([pair[1] for pair in parentheses_pairs])
+    pairs = dict(zip(open_paren, close_paren))
+
+    for i, char in enumerate(s):
+        if char in open_paren:
+            stack.append(pairs[char])  # Push the corresponding closing parenthesis
+        elif char in close_paren:
+            if stack and char == stack[-1]:  # If it's the correct closing type
+                stack.pop()
+            else:
+                # Handle mismatched or unbalanced parentheses here if needed
+                pass
+        elif char == delimiter and not stack:  # If it's a comma and no open parentheses
+            splits.append(s[last_split:i])
+            last_split = i + 1
+
+    splits.append(s[last_split:])  # Add the last segment
+    return splits
 
 
 def timefmt(strt):
