@@ -31,7 +31,7 @@ class Ass2srt:
                 line = line.lstrip("Dialogue:")
                 #  split at commas, unless in bracktes, eg  {\fad(500,500)}{\be35}樱律联萌站 bbs.ylbud.com
                 #  note that perhaps it would be better to split at commas, unless in curley brackets
-                node = _split_ignoring_parentheses(line, delimiter=',')
+                node = _split_ignoring_parentheses(line, delimiter=',', max_split=9)
 
                 assert len(node) == 10
 
@@ -78,10 +78,11 @@ class Ass2srt:
 
 
 
-def _split_ignoring_parentheses(s, delimiter=','):
+def _split_ignoring_parentheses(s, delimiter=',', max_split=-1):
     splits = []
     last_split = 0
     stack = []  # Stack to keep track of the types of open parentheses
+    split_count = 0  # Counter for the number of splits made
 
     # Define pairs of parentheses including half-width and full-width characters
     parentheses_pairs = [
@@ -103,9 +104,12 @@ def _split_ignoring_parentheses(s, delimiter=','):
             else:
                 # Handle mismatched or unbalanced parentheses here if needed
                 pass
-        elif char == delimiter and not stack:  # If it's a comma and no open parentheses
+        elif char == delimiter and not stack:  # If it's a delimiter and no open parentheses
             splits.append(s[last_split:i])
             last_split = i + 1
+            split_count += 1  # Increment the split counter
+            if 0 <= max_split <= split_count:  # Check if max splits reached
+                break
 
     splits.append(s[last_split:])  # Add the last segment
     return splits
